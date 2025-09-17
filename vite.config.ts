@@ -5,6 +5,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  // Important for GitHub Pages: ensures assets and router work under /makeup-lounge/
+  base: mode === "production" ? "/makeup-lounge/" : "/",
   server: {
     host: "::",
     port: 8080,
