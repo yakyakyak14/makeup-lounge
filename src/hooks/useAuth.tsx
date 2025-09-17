@@ -40,7 +40,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string, userType: 'artist' | 'client', firstName: string, lastName: string) => {
-    const redirectUrl = `${window.location.origin}/auth/callback`;
+    const basePath = import.meta.env.MODE === 'production' ? '/makeup-lounge' : '';
+    const redirectUrl = `${window.location.origin}${basePath}/auth/callback`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -66,10 +67,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signInWithGoogle = async () => {
+    const basePath = import.meta.env.MODE === 'production' ? '/makeup-lounge' : '';
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`
+        redirectTo: `${window.location.origin}${basePath}/auth/callback`
       }
     });
     return { error };
