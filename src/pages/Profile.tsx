@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Camera, Upload, Star, MapPin, Phone, Instagram, Facebook, Award, Edit2, Save, X } from "lucide-react";
+import { Camera, Upload, Star, MapPin, Phone, Instagram, Facebook, Award, Edit2, Save, X, Trash2 } from "lucide-react";
 
 interface ProfileData {
   first_name?: string;
@@ -48,11 +48,14 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
+  const [portfolio, setPortfolio] = useState<{ name: string; url: string; type: 'image' | 'video'; }[]>([]);
+  const [portfolioLoading, setPortfolioLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
       fetchProfile();
       fetchStats();
+      fetchPortfolio();
     }
   }, [user]);
 
@@ -65,6 +68,106 @@ const Profile = () => {
 
     if (data) {
       setProfile(data);
+    }
+  };
+
+  const handleDeleteProfilePicture = async () => {
+    if (!user) return;
+    try {
+      // Remove any files under profiles/{userId}
+      const list = await supabase.storage
+        .from('makeupstudioappbucket')
+        .list(`profiles/${user.id}`);
+      const files = list.data || [];
+
+      if (files.length > 0) {
+        await supabase.storage
+          .from('makeupstudioappbucket')
+          .remove(files.map(f => `profiles/${user.id}/${f.name}`));
+      }
+
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ profile_picture_url: null })
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
+      setProfile(prev => ({ ...prev, profile_picture_url: undefined }));
+      toast({ title: 'Removed', description: 'Profile picture deleted.' });
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Error', description: e.message || 'Failed to delete profile picture', variant: 'destructive' });
+    }
+  };
+
+  const fetchPortfolio = async () => {
+    if (!user) return;
+    setPortfolioLoading(true);
+    try {
+      const { data, error } = await supabase.storage
+        .from('makeupstudioappbucket')
+        .list(`portfolios/${user.id}`, { limit: 20, offset: 0, sortBy: { column: 'created_at', order: 'desc' } as any });
+      if (error) throw error;
+      const items = (data || []).map((f: any) => {
+        const { data: pub } = supabase.storage
+          .from('makeupstudioappbucket')
+          .getPublicUrl(`portfolios/${user.id}/${f.name}`);
+        const ext = (f.name as string).split('.').pop()?.toLowerCase() || '';
+        const isVideo = ['mp4','mov','webm','mkv','avi'].includes(ext);
+        return { name: f.name, url: pub.publicUrl, type: isVideo ? 'video' : 'image' as const };
+      });
+      setPortfolio(items);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setPortfolioLoading(false);
+    }
+  };
+
+  const handlePortfolioUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const remaining = 5 - portfolio.length;
+    if (files.length > remaining) {
+      toast({ title: 'Limit exceeded', description: `You can upload up to 5 items. ${remaining} slot(s) left.`, variant: 'destructive' });
+      return;
+    }
+    try {
+      for (const file of Array.from(files)) {
+        const ts = Date.now();
+        const safeName = `${ts}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+        const path = `portfolios/${user.id}/${safeName}`;
+        const { error: upErr } = await supabase.storage
+          .from('makeupstudioappbucket')
+          .upload(path, file, { upsert: false });
+        if (upErr) throw upErr;
+      }
+      toast({ title: 'Uploaded', description: 'Media added to your portfolio.' });
+      await fetchPortfolio();
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Error', description: e.message || 'Failed to upload media', variant: 'destructive' });
+    } finally {
+      // reset input value to allow re-upload of same files if needed
+      event.currentTarget.value = '';
+    }
+  };
+
+  const handleDeletePortfolioItem = async (name: string) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase.storage
+        .from('makeupstudioappbucket')
+        .remove([`portfolios/${user.id}/${name}`]);
+      if (error) throw error;
+      setPortfolio(prev => prev.filter(p => p.name !== name));
+      toast({ title: 'Deleted', description: 'Media removed from your portfolio.' });
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Error', description: e.message || 'Failed to delete media', variant: 'destructive' });
     }
   };
 
@@ -241,6 +344,16 @@ const Profile = () => {
                     disabled={imageUploading}
                   />
                 </label>
+                {profile.profile_picture_url && (
+                  <button
+                    type="button"
+                    onClick={handleDeleteProfilePicture}
+                    className="absolute top-2 right-2 bg-destructive text-destructive-foreground rounded-full p-2 hover:opacity-90"
+                    title="Delete profile picture"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               <h2 className="text-2xl font-playfair font-bold mb-2">
@@ -338,6 +451,59 @@ const Profile = () => {
                       <p className="text-sm text-muted-foreground">Completion Rate</p>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Artist Portfolio (max 5 items) */}
+            {isArtist && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Portfolio <span className="text-sm text-muted-foreground">({portfolio.length}/5)</span></CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="mb-4">
+                    <Label>Upload images or videos (max 5)</Label>
+                    <div className="mt-2 flex items-center gap-3">
+                      <label className={`inline-flex items-center gap-2 px-3 py-2 border rounded-lg cursor-pointer ${portfolio.length >= 5 ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                        <Upload className="w-4 h-4" />
+                        <span>Upload</span>
+                        <input
+                          type="file"
+                          accept="image/*,video/*"
+                          multiple
+                          onChange={handlePortfolioUpload}
+                          className="hidden"
+                          disabled={portfolio.length >= 5}
+                        />
+                      </label>
+                      {portfolioLoading && <span className="text-sm text-muted-foreground">Loading...</span>}
+                    </div>
+                  </div>
+
+                  {portfolio.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">No media yet. Upload up to 5 images or videos to showcase your work.</p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {portfolio.map(item => (
+                        <div key={item.name} className="relative group rounded-lg overflow-hidden border">
+                          {item.type === 'video' ? (
+                            <video src={item.url} controls className="w-full h-40 object-cover" />
+                          ) : (
+                            <img src={item.url} alt={item.name} className="w-full h-40 object-cover" />
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => handleDeletePortfolioItem(item.name)}
+                            className="absolute top-2 right-2 p-2 rounded-full bg-black/60 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             )}
