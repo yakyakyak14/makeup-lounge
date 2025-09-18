@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import ProfileDropdown from "@/components/ProfileDropdown";
+import ThemeToggle from "@/components/ThemeToggle";
 import HeaderLogo from "@/components/HeaderLogo";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { LayoutDashboard, Calendar, User, Star, Settings, Sparkles, Users, Search, Menu } from "lucide-react";
@@ -79,7 +80,10 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
                 <SidebarTrigger />
                 <HeaderLogo />
               </div>
-              <ProfileDropdown />
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <ProfileDropdown />
+              </div>
             </header>
             
             <main className="flex-1 p-6 overflow-auto">
