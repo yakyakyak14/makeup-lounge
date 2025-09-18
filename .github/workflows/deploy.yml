@@ -41,6 +41,17 @@ jobs:
           # Optional: comma-separated keywords and routes
           VITE_SEO_EXTRA_KEYWORDS: ${{ secrets.VITE_SEO_EXTRA_KEYWORDS }}
           SEO_EXTRA_ROUTES: ${{ secrets.SEO_EXTRA_ROUTES }}
+          # Business metadata for JSON-LD (optional)
+          VITE_BUSINESS_NAME: ${{ secrets.VITE_BUSINESS_NAME }}
+          VITE_BUSINESS_PHONE: ${{ secrets.VITE_BUSINESS_PHONE }}
+          VITE_BUSINESS_STREET: ${{ secrets.VITE_BUSINESS_STREET }}
+          VITE_BUSINESS_CITY: ${{ secrets.VITE_BUSINESS_CITY }}
+          VITE_BUSINESS_REGION: ${{ secrets.VITE_BUSINESS_REGION }}
+          VITE_BUSINESS_POSTAL: ${{ secrets.VITE_BUSINESS_POSTAL }}
+          VITE_BUSINESS_COUNTRY: ${{ secrets.VITE_BUSINESS_COUNTRY }}
+          VITE_BUSINESS_LAT: ${{ secrets.VITE_BUSINESS_LAT }}
+          VITE_BUSINESS_LNG: ${{ secrets.VITE_BUSINESS_LNG }}
+          VITE_BUSINESS_SAMEAS: ${{ secrets.VITE_BUSINESS_SAMEAS }}
 
       - name: Add SPA fallback (404.html)
         run: cp dist/index.html dist/404.html

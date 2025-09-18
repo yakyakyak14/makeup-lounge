@@ -4,6 +4,29 @@
 const fs = require('fs');
 const path = require('path');
 
+// Lightweight .env loader (no external deps)
+(() => {
+  try {
+    const envPath = path.resolve(__dirname, '..', '.env');
+    if (fs.existsSync(envPath)) {
+      const txt = fs.readFileSync(envPath, 'utf8');
+      txt.split(/\r?\n/).forEach((line) => {
+        const m = line.match(/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)\s*$/);
+        if (!m) return;
+        const key = m[1];
+        let val = m[2];
+        // Strip surrounding quotes
+        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
+          val = val.slice(1, -1);
+        }
+        if (!process.env[key]) process.env[key] = val;
+      });
+    }
+  } catch (e) {
+    // ignore
+  }
+})();
+
 function getEnv(name, def) {
   const v = process.env[name];
   return v && v.trim() ? v.trim() : def;
