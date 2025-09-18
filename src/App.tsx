@@ -34,6 +34,13 @@ const RouterWithSplash = () => {
   }, []);
 
   useEffect(() => {
+    // Splash on every route change
+    setShowSplash(true);
+    const t = setTimeout(() => setShowSplash(false), 700);
+    return () => clearTimeout(t);
+  }, [location.key]);
+
+  useEffect(() => {
     // Show splash when user comes back to the app (tab visible again)
     const onVis = () => {
       if (document.visibilityState === 'visible') {

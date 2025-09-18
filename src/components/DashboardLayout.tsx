@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "@/components/theme-provider";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import HeaderLogo from "@/components/HeaderLogo";
-import { Button } from "@/components/ui/button";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { LayoutDashboard, Calendar, User, Star, Settings, Sparkles, Users, Search, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -36,7 +35,18 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           <Sidebar className="border-r border-border">
             <SidebarContent>
               <div className="p-6 border-b">
-                <h2 className="text-xl font-playfair font-bold text-primary">Make-Up Lounge</h2>
+                <button
+                  type="button"
+                  onClick={() => navigate('/')}
+                  className="flex items-center gap-2"
+                  aria-label="Make-Up Lounge Home"
+                >
+                  <img
+                    src={import.meta.env.BASE_URL + 'logo.png'}
+                    alt="Make-Up Lounge"
+                    className="h-8 w-auto"
+                  />
+                </button>
               </div>
               
               <SidebarGroup>
