@@ -11,7 +11,8 @@ const HeaderLogo = () => {
     >
       <img
         src={import.meta.env.BASE_URL + 'logo.png'}
-        alt="Make-Up Lounge"
+        alt="Make-Up Lounge — Beauty & Makeup Booking Platform"
+        title="Make-Up Lounge — Book Professional Makeup Artists Online"
         className="h-8 w-auto select-none"
       />
       <span className="font-playfair text-lg font-bold text-primary group-hover:opacity-80">

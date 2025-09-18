@@ -21,6 +21,7 @@ import Help from "./pages/Help";
 import SplashScreen from "@/components/SplashScreen";
 import { useEffect, useState } from "react";
 import { ThemeProvider } from "@/components/theme-provider";
+import RouteSEO from "@/seo/RouteSEO";
 
 const queryClient = new QueryClient();
 
@@ -64,6 +65,7 @@ const RouterWithSplash = () => {
   return (
     <>
       {showSplash && <SplashScreen />}
+      <RouteSEO />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />

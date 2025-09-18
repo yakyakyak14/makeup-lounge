@@ -35,6 +35,12 @@ jobs:
         env:
           NODE_ENV: production
           VITE_PAYSTACK_PUBLIC_KEY: ${{ secrets.VITE_PAYSTACK_PUBLIC_KEY }}
+          # SEO domain and customization for sitemap/robots and runtime SEO
+          SITE_URL: ${{ secrets.SITE_URL }}
+          VITE_SITE_URL: ${{ secrets.SITE_URL }}
+          # Optional: comma-separated keywords and routes
+          VITE_SEO_EXTRA_KEYWORDS: ${{ secrets.VITE_SEO_EXTRA_KEYWORDS }}
+          SEO_EXTRA_ROUTES: ${{ secrets.SEO_EXTRA_ROUTES }}
 
       - name: Add SPA fallback (404.html)
         run: cp dist/index.html dist/404.html
