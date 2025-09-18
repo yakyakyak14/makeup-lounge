@@ -36,10 +36,10 @@ const SplashScreen: React.FC = () => {
     return () => { cancelled = true; };
   }, [base]);
 
-  // Reduce speed by 25% => playback at 0.75x for Lottie
+  // Smoother feel: Lottie playback at 0.65x
   useEffect(() => {
     if (mode === "lottie" && lottieRef.current) {
-      try { lottieRef.current.setSpeed(0.75); } catch {}
+      try { lottieRef.current.setSpeed(0.65); } catch {}
     }
   }, [mode]);
 
@@ -58,7 +58,7 @@ const SplashScreen: React.FC = () => {
           <img src={base + "logo.png"} alt="Make-Up Lounge" className="h-20 w-auto animate-pulse" />
         )}
         <div className="mt-6 h-1 w-40 bg-accent/50 overflow-hidden rounded-full">
-          <div className="h-full w-1/3 bg-primary animate-[slide_1.6s_ease_infinite]"></div>
+          <div className="h-full w-1/3 bg-primary animate-[slide_1.8s_ease_infinite]"></div>
         </div>
       </div>
       <style>

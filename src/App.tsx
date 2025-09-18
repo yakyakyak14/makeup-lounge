@@ -29,14 +29,14 @@ const RouterWithSplash = () => {
 
   useEffect(() => {
     // Initial splash on app load
-    const t = setTimeout(() => setShowSplash(false), 1600);
+    const t = setTimeout(() => setShowSplash(false), 1800);
     return () => clearTimeout(t);
   }, []);
 
   useEffect(() => {
     // Splash on every route change
     setShowSplash(true);
-    const t = setTimeout(() => setShowSplash(false), 934);
+    const t = setTimeout(() => setShowSplash(false), 1050);
     return () => clearTimeout(t);
   }, [location.key]);
 
@@ -45,7 +45,7 @@ const RouterWithSplash = () => {
     const onVis = () => {
       if (document.visibilityState === 'visible') {
         setShowSplash(true);
-        const t = setTimeout(() => setShowSplash(false), 1067);
+        const t = setTimeout(() => setShowSplash(false), 1200);
         // @ts-ignore attach for cleanup
         onVis._t && clearTimeout(onVis._t);
         // @ts-ignore store timer id
