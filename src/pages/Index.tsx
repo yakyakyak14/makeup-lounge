@@ -82,7 +82,7 @@ const Index = () => {
       <section className="relative overflow-hidden bg-gradient-hero">
         <div className="absolute inset-0 opacity-20">
           <img 
-            src="/placeholder.svg" 
+            src={import.meta.env.BASE_URL + "placeholder.svg"}
             alt="Professional makeup artist at work" 
             className="w-full h-full object-cover"
           />
@@ -236,7 +236,7 @@ const Index = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="order-2 lg:order-1">
               <img 
-                src="/placeholder.svg" 
+                src={import.meta.env.BASE_URL + "placeholder.svg"}
                 alt="Beautiful client experience" 
                 className="rounded-2xl shadow-elegant hover-lift"
               />

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,88 +6,192 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { MessageCircle, Send, ArrowLeft } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { useLocation } from "react-router-dom";
 
-interface Conversation {
+type Conversation = {
   id: string;
   name: string;
-  lastMessage: string;
   time: string;
-  unread: number;
   type: "client" | "artist";
-}
+  partner_id: string;
+};
 
-interface Message {
+type Message = {
   id: string;
   text: string;
   sender: "me" | "other";
   time: string;
-}
+};
+
+type ConversationRow = {
+  id: string;
+  artist_id: string;
+  client_id: string;
+  booking_id: string | null;
+  created_at: string;
+};
+
+type MessageRow = {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+};
 
 const Messages = () => {
+  const { user } = useAuth();
+  const location = useLocation() as any;
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
   const [newMessage, setNewMessage] = useState("");
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [loadingConvs, setLoadingConvs] = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
 
-  // Sample data for demonstration
-  const conversations: Conversation[] = [
-    {
-      id: "1",
-      name: "Sarah Johnson",
-      lastMessage: "Looking forward to our session tomorrow!",
-      time: "2h ago",
-      unread: 2,
-      type: "client"
-    },
-    {
-      id: "2", 
-      name: "Emma Wilson",
-      lastMessage: "Thank you for the amazing makeup!",
-      time: "1d ago",
-      unread: 0,
-      type: "client"
-    },
-    {
-      id: "3",
-      name: "Maya Chen (Artist)",
-      lastMessage: "I'd love to collaborate on this project",
-      time: "3d ago", 
-      unread: 1,
-      type: "artist"
+  const timeText = (iso: string) => new Date(iso).toLocaleString();
+
+  const fetchConversations = async () => {
+    if (!user?.id) return;
+    setLoadingConvs(true);
+    try {
+      const { data: convs, error } = await supabase
+        .from('conversations')
+        .select('id, artist_id, client_id, booking_id, created_at')
+        .or(`artist_id.eq.${user.id},client_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+
+      const ids = (convs || []) as ConversationRow[];
+      const partnerIds = Array.from(new Set(ids.map(c => c.artist_id === user.id ? c.client_id : c.artist_id)));
+      let nameMap = new Map<string, { name: string; type: 'client' | 'artist' }>();
+      if (partnerIds.length > 0) {
+        const { data: partners } = await supabase
+          .from('profiles')
+          .select('user_id, first_name, last_name, user_type')
+          .in('user_id', partnerIds);
+        (partners || []).forEach((p: any) => {
+          nameMap.set(p.user_id, { name: `${p.first_name || ''} ${p.last_name || ''}`.trim() || 'User', type: p.user_type === 'artist' ? 'artist' : 'client' });
+        });
+      }
+
+      const convItems: Conversation[] = ids.map(c => {
+        const partnerId = c.artist_id === user.id ? c.client_id : c.artist_id;
+        const partner = nameMap.get(partnerId) || { name: 'User', type: 'client' as const };
+        return {
+          id: c.id,
+          name: partner.name,
+          time: timeText(c.created_at),
+          type: partner.type,
+          partner_id: partnerId,
+        };
+      });
+      setConversations(convItems);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingConvs(false);
     }
-  ];
+  };
 
-  const sampleMessages: Message[] = [
-    {
-      id: "1",
-      text: "Hi! I'd like to book you for my wedding on March 15th",
-      sender: "other",
-      time: "10:30 AM"
-    },
-    {
-      id: "2", 
-      text: "I'd be happy to help! What time works best for you?",
-      sender: "me",
-      time: "10:35 AM"
-    },
-    {
-      id: "3",
-      text: "Around 8 AM would be perfect. How much do you charge for bridal makeup?",
-      sender: "other", 
-      time: "10:40 AM"
-    },
-    {
-      id: "4",
-      text: "My bridal package starts at ₦50,000. This includes trial, day-of makeup, and touch-up kit.",
-      sender: "me",
-      time: "10:45 AM"
+  useEffect(() => { fetchConversations(); }, [user?.id]);
+
+  const fetchMessages = async (conversationId: string) => {
+    if (!user?.id) return;
+    const { data, error } = await supabase
+      .from('messages')
+      .select('id, conversation_id, sender_id, content, created_at')
+      .eq('conversation_id', conversationId)
+      .order('created_at', { ascending: true });
+    if (error) {
+      console.error(error);
+      return;
     }
-  ];
+    const mapped: Message[] = (data as MessageRow[]).map(m => ({
+      id: m.id,
+      text: m.content,
+      sender: m.sender_id === user.id ? 'me' : 'other',
+      time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    }));
+    setMessages(mapped);
+  };
 
-  const handleSendMessage = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (!selectedConversation?.id) return;
+    fetchMessages(selectedConversation.id);
+
+    const channel = supabase
+      .channel(`conv:${selectedConversation.id}`)
+      .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'messages',
+        filter: `conversation_id=eq.${selectedConversation.id}`,
+      }, (payload) => {
+        const m = payload.new as MessageRow;
+        setMessages(prev => ([...prev, {
+          id: m.id,
+          text: m.content,
+          sender: m.sender_id === user?.id ? 'me' : 'other',
+          time: new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        }]));
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [selectedConversation?.id, user?.id]);
+
+  const ensureConversationForBooking = async (bookingId: string, artistId: string, clientId: string) => {
+    // 1) Try by booking_id
+    const { data: existing, error: exErr } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('booking_id', bookingId)
+      .maybeSingle();
+    if (!exErr && existing?.id) return existing.id as string;
+
+    // 2) Create if missing
+    const { data: created, error: insErr } = await supabase
+      .from('conversations')
+      .insert({ booking_id: bookingId, artist_id: artistId, client_id: clientId })
+      .select('id')
+      .single();
+    if (insErr) throw insErr;
+    return created.id as string;
+  };
+
+  useEffect(() => {
+    // If navigated from Bookings with a bookingId, ensure conversation exists and open it
+    const s = (location?.state || {}) as any;
+    if (!user?.id || (!s.bookingId && !s.conversationId)) return;
+
+    (async () => {
+      try {
+        let convId = s.conversationId as string | undefined;
+        if (!convId && s.bookingId && s.artistId && s.clientId) {
+          convId = await ensureConversationForBooking(s.bookingId, s.artistId, s.clientId);
+        }
+        if (!convId) return;
+        // Refresh conv list then select
+        await fetchConversations();
+        const conv = conversations.find(c => c.id === convId);
+        if (conv) setSelectedConversation(conv);
+        else setSelectedConversation({ id: convId, name: 'Conversation', time: '', type: 'client', partner_id: '' });
+      } catch (e) {
+        console.error(e);
+      }
+    })();
+  }, [location?.state, user?.id]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
-    
-    // In a real app, this would send to backend
-    console.log('Sending message:', newMessage);
+    if (!newMessage.trim() || !selectedConversation?.id || !user?.id) return;
+    await supabase.from('messages').insert({
+      conversation_id: selectedConversation.id,
+      sender_id: user.id,
+      content: newMessage.trim(),
+    });
     setNewMessage("");
   };
 
@@ -135,18 +239,10 @@ const Messages = () => {
                         <p className="font-medium text-sm truncate">
                           {conversation.name}
                         </p>
-                        <p className="text-xs text-muted-foreground truncate">
-                          {conversation.lastMessage}
-                        </p>
                         <p className="text-xs text-muted-foreground">
                           {conversation.time}
                         </p>
                       </div>
-                      {conversation.unread > 0 && (
-                        <Badge variant="default" className="text-xs">
-                          {conversation.unread}
-                        </Badge>
-                      )}
                     </div>
                   </div>
                 ))
@@ -183,7 +279,7 @@ const Messages = () => {
 
                 {/* Messages */}
                 <div className="flex-1 p-4 space-y-4 overflow-y-auto max-h-[400px]">
-                  {sampleMessages.map((message) => (
+                  {messages.map((message) => (
                     <div
                       key={message.id}
                       className={`flex ${
