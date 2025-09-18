@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import HeaderLogo from "@/components/HeaderLogo";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -21,9 +21,9 @@ const NotFound = () => {
         </div>
         <h1 className="mb-2 text-4xl font-bold text-primary">404</h1>
         <p className="mb-6 text-muted-foreground">Oops! Page not found</p>
-        <a href="/" className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
+        <Link to="/" className="inline-block px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:opacity-90">
           Return to Home
-        </a>
+        </Link>
       </div>
     </div>
   );
