@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Heart, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import HeaderLogo from '@/components/HeaderLogo';
 
 type UserType = 'artist' | 'client';
 type AuthMode = 'signin' | 'signup';
@@ -191,14 +192,12 @@ const Auth = () => {
             Back to Home
           </Button>
           
-          <div className="text-center">
-            <h1 className="text-3xl font-playfair font-bold text-white mb-2">
-              Make-Up Lounge
-            </h1>
-            <p className="text-white/80">
-              {authMode === 'signin' ? 'Welcome back!' : 'Join our community'}
-            </p>
+          <div className="flex justify-center">
+            <HeaderLogo />
           </div>
+          <p className="text-center text-white/80 mt-2">
+            {authMode === 'signin' ? 'Welcome back!' : 'Join our community'}
+          </p>
         </div>
 
         <Card className="p-6 bg-white/95 backdrop-blur-sm border-white/30">

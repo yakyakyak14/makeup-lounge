@@ -3,37 +3,23 @@
 [![Live – GitHub Pages](https://img.shields.io/badge/Live-GitHub%20Pages-2ea44f?logo=github)](https://yakyakyak14.github.io/makeup-lounge/)
 [![Deploy](https://github.com/yakyakyak14/makeup-lounge/actions/workflows/deploy.yml/badge.svg)](https://github.com/yakyakyak14/makeup-lounge/actions/workflows/deploy.yml)
 
-## Project info
+An elegant booking platform connecting makeup artists with clients. Features include Google OAuth, services management, bookings, payments (stub), ratings, artist portfolios (images/videos), and a polished light/dark UI.
 
-**URL**: https://lovable.dev/projects/75f914a8-edc8-454c-8676-11f337a91984
+## Local development
 
-## How can I edit this code?
-
-There are several ways of editing your application.
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/75f914a8-edc8-454c-8676-11f337a91984) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+Requirements: Node.js 18+ and npm
 
 Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+git clone https://github.com/yakyakyak14/makeup-lounge.git
 
 # Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+cd makeup-lounge
 
 # Step 3: Install the necessary dependencies.
-npm i
+npm ci
 
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
@@ -82,10 +68,6 @@ In Supabase Auth → URL Configuration → Redirect URLs, add:
 https://yakyakyak14.github.io/makeup-lounge/auth/callback
 ```
 
-## Can I connect a custom domain to my Lovable project?
+## Custom domain
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+You can point a custom domain to GitHub Pages via repository Settings → Pages. Configure DNS (CNAME/ALIAS) to the GitHub Pages hostname.

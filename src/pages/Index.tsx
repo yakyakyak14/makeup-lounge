@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Sparkles, Users, Calendar, Star, Heart, ArrowRight, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import HeaderLogo from "@/components/HeaderLogo";
 // Using public placeholder images to avoid missing asset issues
 
 type UserType = "artist" | "client" | null;
@@ -87,6 +88,9 @@ const Index = () => {
         </div>
         
         <div className="relative z-10 container mx-auto px-4 py-20">
+          <div className="mb-8">
+            <HeaderLogo />
+          </div>
           {/* Auth Status Bar */}
           {user && (
             <div className="absolute top-4 right-4">

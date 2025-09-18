@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Sparkles, Heart } from 'lucide-react';
+import HeaderLogo from '@/components/HeaderLogo';
 
 type UserType = 'artist' | 'client';
 
@@ -143,12 +144,10 @@ const AuthCallback = () => {
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-playfair font-bold text-white mb-2">
-            Welcome to Make-Up Lounge!
-          </h1>
-          <p className="text-white/80">
-            Let's complete your profile setup
-          </p>
+          <div className="flex justify-center mb-2">
+            <HeaderLogo />
+          </div>
+          <p className="text-white/80">Let's complete your profile setup</p>
         </div>
 
         <Card className="p-6 bg-white/95 backdrop-blur-sm border-white/30">
