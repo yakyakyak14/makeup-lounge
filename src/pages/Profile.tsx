@@ -55,9 +55,15 @@ const Profile = () => {
     if (user) {
       fetchProfile();
       fetchStats();
-      fetchPortfolio();
     }
   }, [user]);
+
+  useEffect(() => {
+    if (user && profile.user_type === 'artist') {
+      fetchPortfolio();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.user_type, user?.id]);
 
   const fetchProfile = async () => {
     const { data, error } = await supabase
@@ -107,7 +113,7 @@ const Profile = () => {
     try {
       const { data, error } = await supabase.storage
         .from('makeupstudioappbucket')
-        .list(`portfolios/${user.id}`, { limit: 20, offset: 0, sortBy: { column: 'created_at', order: 'desc' } as any });
+        .list(`portfolios/${user.id}`, { limit: 20, offset: 0, sortBy: { column: 'updated_at', order: 'desc' } });
       if (error) throw error;
       const items = (data || []).map((f: any) => {
         const { data: pub } = supabase.storage
