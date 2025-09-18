@@ -101,21 +101,33 @@ const Browse = () => {
       });
     });
 
-    // Fetch all bookings for these artists and aggregate counts client-side
-    const { data: bookingsAll, error: bookingsError } = await supabase
-      .from('bookings')
-      .select('id, artist_id')
-      .in('artist_id', artistIds)
-      .eq('status', 'completed');
-
-    if (bookingsError) {
-      console.error(bookingsError);
-    }
-
+    // Fetch bookings count via view if available; fallback to aggregating client-side
     const bookingCountMap = new Map<string, number>();
-    (bookingsAll || []).forEach((b: any) => {
-      bookingCountMap.set(b.artist_id, (bookingCountMap.get(b.artist_id) || 0) + 1);
-    });
+    const bcRes = await supabase
+      .from('bookings_count_by_artist_completed')
+      .select('artist_id, bookings_count')
+      .in('artist_id', artistIds);
+
+    if (bcRes.error) {
+      // Fallback: direct query and in-memory aggregation
+      const { data: bookingsAll, error: bookingsError } = await supabase
+        .from('bookings')
+        .select('id, artist_id')
+        .in('artist_id', artistIds)
+        .eq('status', 'completed');
+
+      if (bookingsError) {
+        console.error(bookingsError);
+      }
+
+      (bookingsAll || []).forEach((b: any) => {
+        bookingCountMap.set(b.artist_id, (bookingCountMap.get(b.artist_id) || 0) + 1);
+      });
+    } else {
+      (bcRes.data || []).forEach((row: any) => {
+        bookingCountMap.set(row.artist_id, Number(row.bookings_count) || 0);
+      });
+    }
 
     const merged = profiles.map((profile) => {
       const s = statsMap.get(profile.user_id);
