@@ -114,7 +114,7 @@ const Index = () => {
           <div className="max-w-4xl mx-auto text-center">
             <div className="animate-fade-up">
               <h1 className="text-5xl md:text-7xl font-playfair font-bold text-white mb-6 leading-tight">
-                Make-Up <span className="text-gradient bg-gradient-to-r from-pink-200 to-white bg-clip-text text-transparent">Lounge</span>
+                Make-Up <span className="text-gradient drop-shadow-[0_2px_6px_rgba(240,72,120,0.35)]">Lounge</span>
               </h1>
               <p className="text-xl md:text-2xl text-white/90 mb-8 leading-relaxed">
                 Where Beauty Professionals Meet Their Perfect Clients

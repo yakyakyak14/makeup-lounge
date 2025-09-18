@@ -19,26 +19,27 @@
     --primary-glow: 350 100% 88%;
 
     /* Secondary - Lavender & Coral */
-    --secondary: 285 60% 85%;
+    --secondary: 285 55% 88%;
     --secondary-foreground: 340 15% 15%;
     --coral: 16 100% 66%;
     --coral-light: 16 100% 85%;
 
     /* Elegant neutrals */
-    --muted: 340 30% 96%;
+    --muted: 345 30% 95%;
     --muted-foreground: 340 10% 45%;
-    --accent: 345 50% 92%;
+    --accent: 345 55% 90%;
     --accent-foreground: 340 15% 20%;
 
     /* Surface colors */
-    --card: 0 0% 100%;
+    /* Slightly tinted surfaces to differentiate from Light theme */
+    --card: 345 60% 99%;
     --card-foreground: 340 15% 15%;
-    --popover: 0 0% 100%;
+    --popover: 345 60% 99%;
     --popover-foreground: 340 15% 15%;
 
     /* Interactive elements */
-    --border: 340 30% 90%;
-    --input: 340 30% 94%;
+    --border: 345 25% 90%;
+    --input: 345 30% 94%;
     --ring: 340 82% 52%;
 
     /* Status colors */
@@ -53,7 +54,7 @@
     --gradient-primary: linear-gradient(135deg, hsl(340, 82%, 52%), hsl(350, 100%, 70%));
     --gradient-secondary: linear-gradient(135deg, hsl(285, 60%, 85%), hsl(320, 70%, 85%));
     --gradient-coral: linear-gradient(135deg, hsl(16, 100%, 66%), hsl(25, 100%, 75%));
-    --gradient-hero: linear-gradient(135deg, hsl(345, 75%, 65%) 0%, hsl(340, 82%, 52%) 50%, hsl(285, 60%, 75%) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(345, 75%, 65%) 0%, hsl(340, 82%, 52%) 50%, hsl(300, 45%, 86%) 100%);
     --gradient-card: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(255, 240, 245, 0.6));
 
     /* Elegant shadows */
@@ -124,8 +125,8 @@
 
   /* Pink theme variant */
   .pink {
-    /* Keep a gentle blush background and rich pink brand */
-    --background: 350 100% 98%;
+    /* Gentle blush background and rich pink brand */
+    --background: 345 88% 97%;
     --foreground: 340 15% 15%;
 
     --primary: 340 82% 52%;
@@ -168,13 +169,13 @@
     --shadow-elegant: 0 10px 40px -10px rgba(255, 105, 180, 0.2);
     --shadow-glow: 0 0 30px rgba(255, 182, 193, 0.35);
 
-    --sidebar-background: 350 100% 98%;
+    --sidebar-background: 345 88% 97%;
     --sidebar-foreground: 340 15% 15%;
     --sidebar-primary: 340 82% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 345 50% 92%;
+    --sidebar-accent: 345 55% 90%;
     --sidebar-accent-foreground: 340 15% 20%;
-    --sidebar-border: 340 30% 90%;
+    --sidebar-border: 345 25% 90%;
     --sidebar-ring: 340 82% 52%;
   }
 }
@@ -190,6 +191,13 @@
       hsl(var(--background)) 0%, 
       hsl(355, 50%, 97%) 100%);
     min-height: 100vh;
+  }
+
+  /* Pink theme: slightly more blush background wash for distinction */
+  .pink body {
+    background: linear-gradient(135deg,
+      hsl(var(--background)) 0%,
+      hsl(345, 65%, 96%) 100%);
   }
 
   h1, h2, h3, h4, h5, h6 {

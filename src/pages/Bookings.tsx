@@ -16,6 +16,8 @@ import { format } from "date-fns";
 
 interface Booking {
   id: string;
+  artist_id: string;
+  client_id: string;
   booking_date: string;
   status: string;
   original_price: number;
@@ -141,6 +143,7 @@ const Bookings = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'confirmed': return 'bg-success text-success-foreground';
+      case 'paid': return 'bg-success text-success-foreground';
       case 'pending': return 'bg-warning text-warning-foreground';
       case 'cancelled': return 'bg-destructive text-destructive-foreground';
       case 'completed': return 'bg-primary text-primary-foreground';
@@ -161,19 +164,43 @@ const Bookings = () => {
     setPaymentDialog(true);
   };
 
-  const processPayment = async () => {
-    if (!selectedBooking) return;
-    
-    // Here you would integrate with actual payment processor
-    // For now, we'll simulate payment success
-    toast({
-      title: "Payment Processed",
-      description: "Payment has been processed successfully!",
-    });
-    
-    // Update booking status to confirmed after payment
-    updateBookingStatus(selectedBooking.id, 'confirmed');
-    setPaymentDialog(false);
+  // Allow TypeScript access to PaystackPop
+  declare global { interface Window { PaystackPop: any } }
+
+  const payWithPaystack = async () => {
+    if (!selectedBooking || !user) return;
+    const publicKey = import.meta.env.VITE_PAYSTACK_PUBLIC_KEY as string | undefined;
+    if (!publicKey) {
+      toast({
+        title: "Paystack key missing",
+        description: "Please set VITE_PAYSTACK_PUBLIC_KEY in your environment to enable payments.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const total = calculateTotal(selectedBooking);
+    try {
+      const handler = window.PaystackPop?.setup({
+        key: publicKey,
+        email: user.email,
+        amount: Math.round(total * 100), // in kobo
+        currency: 'NGN',
+        ref: `BKG-${selectedBooking.id}-${Date.now()}`,
+        callback: async (response: any) => {
+          toast({ title: 'Payment successful', description: `Ref: ${response.reference}` });
+          await updateBookingStatus(selectedBooking.id, 'paid');
+          setPaymentDialog(false);
+        },
+        onClose: () => {
+          toast({ title: 'Payment closed', description: 'You closed the payment window.' });
+        }
+      });
+      handler?.openIframe?.();
+    } catch (e: any) {
+      console.error(e);
+      toast({ title: 'Payment error', description: e?.message || 'Unable to initialize payment', variant: 'destructive' });
+    }
   };
 
   return (
@@ -366,7 +393,7 @@ const Bookings = () => {
                       </Button>
                     )}
 
-                    {booking.status === 'confirmed' && (
+                    {booking.status === 'paid' && (
                       <Button 
                         variant="outline" 
                         size="sm"
@@ -376,7 +403,11 @@ const Bookings = () => {
                       </Button>
                     )}
 
-                    <Button variant="ghost" size="sm" onClick={() => navigate('/messages')}>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => navigate('/messages', { state: { bookingId: booking.id, artistId: booking.artist_id, clientId: booking.client_id } })}
+                    >
                       <MessageCircle className="mr-2 h-4 w-4" />
                       Contact
                     </Button>
@@ -419,8 +450,8 @@ const Bookings = () => {
                   </div>
                 </div>
 
-                <Button onClick={processPayment} className="w-full">
-                  Process Payment
+                <Button onClick={payWithPaystack} className="w-full">
+                  Pay with Paystack
                 </Button>
               </div>
             )}

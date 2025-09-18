@@ -52,8 +52,8 @@ const Messages = () => {
 
   const timeText = (iso: string) => new Date(iso).toLocaleString();
 
-  const fetchConversations = async () => {
-    if (!user?.id) return;
+  const fetchConversations = async (): Promise<Conversation[]> => {
+    if (!user?.id) return [];
     setLoadingConvs(true);
     try {
       const { data: convs, error } = await supabase
@@ -88,8 +88,10 @@ const Messages = () => {
         };
       });
       setConversations(convItems);
+      return convItems;
     } catch (e) {
       console.error(e);
+      return [];
     } finally {
       setLoadingConvs(false);
     }
@@ -173,9 +175,9 @@ const Messages = () => {
           convId = await ensureConversationForBooking(s.bookingId, s.artistId, s.clientId);
         }
         if (!convId) return;
-        // Refresh conv list then select
-        await fetchConversations();
-        const conv = conversations.find(c => c.id === convId);
+        // Refresh conv list then select using fresh result
+        const convs = await fetchConversations();
+        const conv = convs.find(c => c.id === convId);
         if (conv) setSelectedConversation(conv);
         else setSelectedConversation({ id: convId, name: 'Conversation', time: '', type: 'client', partner_id: '' });
       } catch (e) {
