@@ -9,6 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Sparkles, Heart } from 'lucide-react';
 import HeaderLogo from '@/components/HeaderLogo';
+import ThemeToggle from '@/components/ThemeToggle';
 
 type UserType = 'artist' | 'client';
 
@@ -142,6 +143,9 @@ const AuthCallback = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+      <div className="fixed top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-6">
           <div className="flex justify-center mb-2">

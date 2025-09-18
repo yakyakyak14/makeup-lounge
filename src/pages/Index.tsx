@@ -6,6 +6,7 @@ import { Sparkles, Users, Calendar, Star, Heart, ArrowRight, LogOut } from "luci
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import HeaderLogo from "@/components/HeaderLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 // Using public placeholder images to avoid missing asset issues
 
 type UserType = "artist" | "client" | null;
@@ -91,13 +92,12 @@ const Index = () => {
           <div className="mb-8">
             <HeaderLogo />
           </div>
-          {/* Auth Status Bar */}
-          {user && (
-            <div className="absolute top-4 right-4">
+          {/* Top-right controls: Theme toggle (always) + auth status (if signed in) */}
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <ThemeToggle />
+            {user && (
               <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-lg p-3">
-                <span className="text-white text-sm">
-                  Welcome back, {user.email}
-                </span>
+                <span className="text-white text-sm">Welcome back, {user.email}</span>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -108,8 +108,8 @@ const Index = () => {
                   Sign Out
                 </Button>
               </div>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="max-w-4xl mx-auto text-center">
             <div className="animate-fade-up">

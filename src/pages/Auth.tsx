@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/useAuth';
 import { Sparkles, Heart, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import HeaderLogo from '@/components/HeaderLogo';
+import ThemeToggle from '@/components/ThemeToggle';
 
 type UserType = 'artist' | 'client';
 type AuthMode = 'signin' | 'signup';
@@ -181,6 +182,9 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-4">
+      <div className="fixed top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="mb-6">
           <Button

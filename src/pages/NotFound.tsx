@@ -1,6 +1,7 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import HeaderLogo from "@/components/HeaderLogo";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const NotFound = () => {
   const location = useLocation();
@@ -11,6 +12,9 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-gradient-hero flex items-center justify-center p-6">
+      <div className="fixed top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-lg text-center bg-white/80 backdrop-blur-sm rounded-xl p-8 shadow-elegant">
         <div className="flex justify-center mb-4">
           <HeaderLogo />
