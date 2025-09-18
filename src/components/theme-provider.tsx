@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 
-type Theme = "dark" | "light" | "system"
+type Theme = "dark" | "light" | "system" | "pink"
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -30,14 +30,19 @@ export function ThemeProvider({
   disableTransitionOnChange = false,
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(
-    () => (localStorage.getItem("theme") as Theme) || defaultTheme
-  )
+  const [theme, setTheme] = useState<Theme>(() => {
+    // Always start in pink when requested by defaultTheme
+    if (defaultTheme === "pink") {
+      try { localStorage.setItem("theme", "pink") } catch {}
+      return "pink"
+    }
+    return ((localStorage.getItem("theme") as Theme) || defaultTheme)
+  })
 
   useEffect(() => {
     const root = window.document.documentElement
 
-    root.classList.remove("light", "dark")
+    root.classList.remove("light", "dark", "pink")
 
     if (theme === "system" && enableSystem) {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")

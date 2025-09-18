@@ -20,6 +20,7 @@ import Notifications from "./pages/Notifications";
 import Help from "./pages/Help";
 import SplashScreen from "@/components/SplashScreen";
 import { useEffect, useState } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const queryClient = new QueryClient();
 
@@ -86,15 +87,17 @@ const RouterWithSplash = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter basename={import.meta.env.MODE === 'production' ? '/makeup-lounge' : '/'}>
-          <RouterWithSplash />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <ThemeProvider attribute="class" defaultTheme="pink" enableSystem>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter basename={import.meta.env.MODE === 'production' ? '/makeup-lounge' : '/'}>
+            <RouterWithSplash />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

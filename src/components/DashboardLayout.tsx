@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ThemeProvider } from "@/components/theme-provider";
 import ProfileDropdown from "@/components/ProfileDropdown";
 import HeaderLogo from "@/components/HeaderLogo";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -29,9 +28,8 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-background">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full bg-background">
           <Sidebar className="border-r border-border">
             <SidebarContent>
               <div className="p-6 border-b">
@@ -90,7 +88,6 @@ const DashboardLayout = ({ children }: DashboardLayoutProps) => {
           </div>
         </div>
       </SidebarProvider>
-    </ThemeProvider>
   );
 };
 

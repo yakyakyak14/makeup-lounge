@@ -121,6 +121,62 @@
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
+
+  /* Pink theme variant */
+  .pink {
+    /* Keep a gentle blush background and rich pink brand */
+    --background: 350 100% 98%;
+    --foreground: 340 15% 15%;
+
+    --primary: 340 82% 52%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 345 75% 65%;
+    --primary-glow: 350 100% 88%;
+
+    --secondary: 285 60% 85%;
+    --secondary-foreground: 340 15% 15%;
+    --coral: 16 100% 66%;
+    --coral-light: 16 100% 85%;
+
+    --muted: 340 30% 96%;
+    --muted-foreground: 340 10% 45%;
+    --accent: 345 50% 92%;
+    --accent-foreground: 340 15% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 340 15% 15%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 340 15% 15%;
+
+    --border: 340 30% 90%;
+    --input: 340 30% 94%;
+    --ring: 340 82% 52%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 140 50% 45%;
+    --success-foreground: 0 0% 100%;
+    --warning: 45 90% 55%;
+    --warning-foreground: 0 0% 100%;
+
+    --gradient-primary: linear-gradient(135deg, hsl(340, 82%, 52%), hsl(350, 100%, 70%));
+    --gradient-secondary: linear-gradient(135deg, hsl(285, 60%, 85%), hsl(320, 70%, 85%));
+    --gradient-coral: linear-gradient(135deg, hsl(16, 100%, 66%), hsl(25, 100%, 75%));
+    --gradient-hero: linear-gradient(135deg, hsl(345, 75%, 65%) 0%, hsl(340, 82%, 52%) 50%, hsl(285, 60%, 75%) 100%);
+
+    --shadow-soft: 0 4px 20px -2px rgba(255, 105, 180, 0.12);
+    --shadow-elegant: 0 10px 40px -10px rgba(255, 105, 180, 0.2);
+    --shadow-glow: 0 0 30px rgba(255, 182, 193, 0.35);
+
+    --sidebar-background: 350 100% 98%;
+    --sidebar-foreground: 340 15% 15%;
+    --sidebar-primary: 340 82% 52%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 345 50% 92%;
+    --sidebar-accent-foreground: 340 15% 20%;
+    --sidebar-border: 340 30% 90%;
+    --sidebar-ring: 340 82% 52%;
+  }
 }
 
 @layer base {
