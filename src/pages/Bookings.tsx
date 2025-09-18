@@ -54,6 +54,8 @@ const Bookings = () => {
   const [negotiationPrice, setNegotiationPrice] = useState("");
   const [responseNotes, setResponseNotes] = useState("");
   const [paymentDialog, setPaymentDialog] = useState(false);
+  const [acceptDialogOpen, setAcceptDialogOpen] = useState(false);
+  const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -100,8 +102,9 @@ const Bookings = () => {
   };
 
   const updateBookingStatus = async (bookingId: string, status: string, negotiatedPrice?: number) => {
+    setStatusUpdatingId(bookingId);
     const updates: any = { status };
-    if (negotiatedPrice) {
+    if (typeof negotiatedPrice === 'number' && !Number.isNaN(negotiatedPrice)) {
       updates.negotiated_price = negotiatedPrice;
     }
     if (responseNotes) {
@@ -113,12 +116,15 @@ const Bookings = () => {
       .update(updates)
       .eq('id', bookingId);
 
+    setStatusUpdatingId(null);
+
     if (error) {
       toast({
         title: "Error",
-        description: "Failed to update booking status",
+        description: error.message || "Failed to update booking status",
         variant: "destructive",
       });
+      return false;
     } else {
       toast({
         title: "Success",
@@ -128,6 +134,7 @@ const Bookings = () => {
       setSelectedBooking(null);
       setNegotiationPrice("");
       setResponseNotes("");
+      return true;
     }
   };
 
@@ -266,12 +273,26 @@ const Bookings = () => {
                   <div className="flex flex-wrap gap-2">
                     {isArtist && booking.status === 'pending' && (
                       <>
-                        <Dialog>
+                        <Dialog
+                          open={selectedBooking?.id === booking.id && acceptDialogOpen}
+                          onOpenChange={(open) => {
+                            if (!open) {
+                              setAcceptDialogOpen(false);
+                              setSelectedBooking(null);
+                              setNegotiationPrice("");
+                              setResponseNotes("");
+                            }
+                          }}
+                        >
                           <DialogTrigger asChild>
-                            <Button 
-                              variant="default" 
+                            <Button
+                              variant="default"
                               size="sm"
-                              onClick={() => setSelectedBooking(booking)}
+                              onClick={() => {
+                                setSelectedBooking(booking);
+                                setAcceptDialogOpen(true);
+                              }}
+                              disabled={statusUpdatingId === booking.id}
                             >
                               <CheckCircle className="mr-2 h-4 w-4" />
                               Accept
@@ -304,13 +325,17 @@ const Bookings = () => {
                                   placeholder="Any additional information for the client..."
                                 />
                               </div>
-                              <Button 
-                                onClick={() => updateBookingStatus(
-                                  booking.id, 
-                                  'confirmed', 
-                                  negotiationPrice ? Number(negotiationPrice) : undefined
-                                )}
+                              <Button
+                                onClick={async () => {
+                                  const ok = await updateBookingStatus(
+                                    booking.id,
+                                    'confirmed',
+                                    negotiationPrice !== '' ? Number(negotiationPrice) : undefined
+                                  );
+                                  if (ok) setAcceptDialogOpen(false);
+                                }}
                                 className="w-full"
+                                disabled={statusUpdatingId === booking.id}
                               >
                                 Confirm Booking
                               </Button>
@@ -318,10 +343,11 @@ const Bookings = () => {
                           </DialogContent>
                         </Dialog>
 
-                        <Button 
-                          variant="destructive" 
+                        <Button
+                          variant="destructive"
                           size="sm"
-                          onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+                          onClick={async () => { await updateBookingStatus(booking.id, 'cancelled'); }}
+                          disabled={statusUpdatingId === booking.id}
                         >
                           <XCircle className="mr-2 h-4 w-4" />
                           Decline
